@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  lint:
+  version:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -18,10 +18,17 @@ jobs:
       - name: Git Version
         id: version
         uses: codacy/git-version@2.7.1
-      
+        with:
+          version-format: "v{major}.{minor}.{patch}"  # Define your version format
+
       - name: Use the version
         run: |
-          echo ${{ steps.version.outputs.version }}
-      - name: Use the previous version
+          echo "Current version: ${{ steps.version.outputs.version }}"
+          echo "Previous version: ${{ steps.version.outputs.previous-version }}"
+          
+      - name: Increment Patch Version
         run: |
-          echo ${{ steps.version.outputs.previous-version }}
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
